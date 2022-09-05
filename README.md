@@ -7,7 +7,7 @@ As of yet, this library has not been tested on windows systems, and only support
 ```sh
 make build && make install && make clean
 ```
-**to compile tests, enter example directory and type:**
+**to build and run tests, enter example directory and type:**
 ```sh
 make run && make clean
 ```
