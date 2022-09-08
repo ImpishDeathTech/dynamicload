@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
         }
     }
     else {
-        std::cerr << argc << " invalid arg count: Min 6";
+        std::cerr << argc - 1 << " invalid arg count: Min 6";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
