@@ -1,3 +1,4 @@
+
 /*
  * dlfunctions.c
  *
@@ -33,6 +34,8 @@
  */
 
 #include <dlfunctions.h>
+#include <dlconfiguration.h>
+#include <stdio.h>
 
 dlhandle_t dlhandlex(dlcstr_t modName_, dword_t modeFlag_) {
 #if defined(IDT_DYNAMIC_LOAD_UNIX)
@@ -67,23 +70,30 @@ dlptr_t dlsymbol(dlhandle_t mod_, dlcstr_t sym_) {
 }
 
 
-dlcstr_t dlgeterror() {
-#if defined(IDT_DYNAMIC_LOAD_UNIX)
-    return dlerror();
-
-#elif defined(IDT_DYNAMIC_LOAD_WIN32)
+#if defined(IDT_DYNAMIC_LOAD_WIN32)
+dlcstr_t dlerror(void) {
     return GetLastError();
-#endif
 }
+#endif
 
 
-void dlfree(dlhandle_t mod_) {
+
+int dlfree(dlhandle_t mod_) {
     if (mod_) {
 #if defined(IDT_DYNAMIC_LOAD_UNIX)
-        dlclose(mod_);
+        return dlclose(mod_);
     
 #elif defined(IDT_DYNAMIC_LOAD_WIN32)
-        FreeLibrary(mod_);
+        if (!FreeLibrary(mod_))
+            return -1;
+        else return 0;
 #endif
     }
+    return -1;
+}
+
+void dlprint_version() {
+    char buffer[80];
+    sprintf(buffer, "dynamicload-%d.%d %s", IDT_DYNAMIC_LOAD_VERSION_MAJOR, IDT_DYNAMIC_LOAD_VERSION_MINOR, "Copyright (c) 2022, Christopher Stephen Rafuse BSD-3-Clause"); 
+    printf("%s\n", buffer);
 }
