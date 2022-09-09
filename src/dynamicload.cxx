@@ -89,6 +89,13 @@ namespace dl {
         : m_module(modName_)
     {}
 
+    loader_t::loader_t(symbol_t modName_, dword_t mode_) 
+        : m_module(modName_), m_mode(mode_)
+    {}
+    
+    loader_t::loader_t(dlcstr_t modName_, dword_t mode_)
+        : m_module(modName_), m_mode(mode_)
+    {}
 
     loader_t::~loader_t() {
         this->close();
@@ -99,7 +106,7 @@ namespace dl {
         m_handle = dlhandlex(m_module.c_str(), m_mode);
 
         if (!m_handle) {
-            throw loader_error(dlgeterror());
+            throw loader_error(dlerror());
             return false;
         }
         return true;
@@ -109,7 +116,7 @@ namespace dl {
     dlptr_t loader_t::symbol() {
         dlptr_t p = dlsymbol(m_handle, m_symbol.c_str());
         if (!p) {
-            throw loader_error(dlgeterror(), m_handle);
+            throw loader_error(dlerror(), m_handle);
             return nullptr;
         }
         return p;
@@ -120,7 +127,7 @@ namespace dl {
         for (std::vector<symbol_t>::iterator i = symreg_.symbols.begin(); i != symreg_.symbols.end(); ++i) {
             dlptr_t fp = dlsymbol(m_handle, (*i).c_str());
             if (!fp) {
-                throw loader_error(dlgeterror(), m_handle);
+                throw loader_error(dlerror(), m_handle);
                 return false;
             }
             else symreg_.insert((*i), fp);
@@ -130,6 +137,7 @@ namespace dl {
 
 
     void loader_t::close() {
-        if (m_handle) dlfree(m_handle);
+        if (m_handle)
+            dlfree(m_handle);
     }
 }
