@@ -35,8 +35,8 @@
 #ifndef IDT_DYNAMIC_LOAD_CONFIGURATION_H
 #define IDT_DYNAMIC_LOAD_CONFIGURATION_H
 
-#define IDT_DYNAMIC_LOAD_VERSION_MAJOR 0
-#define IDT_DYNAMIC_LOAD_VERSION_MINOR 5
+#define IDT_DYNAMIC_LOAD_VERSION_MAJOR 1
+#define IDT_DYNAMIC_LOAD_VERSION_MINOR 0
 
 #define IDT_DYNAMIC_LOAD_TESTING       true
 #define IDT_DYNAMIC_LOAD_RELEASE       false
@@ -51,18 +51,63 @@ typedef void* dlptr_t; // pointer type for raw data pointers produced by the dls
 // Unix Implementatioan
 #if defined(__unix__)
 
-    #if defined(__linux__) || defined(__ANDROID__) || defined(__FreeBSD__) || defined(__FreeBSD__kernel__)
+    #if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
         #define IDT_DYNAMIC_LOAD_UNIX
         #define IDT_DL_API __attribute__((__visibility__("default")))
 
         #include <dlfcn.h>
-        #include <unistd.h>
         #include <stdint.h>
 
-        #define DL_LAZY   RTLD_LAZY     // Realocations are preformed at an implementation-dependant time 
+        /* Realocations are preformed at an implementation-dependant time 
+         * 
+         * @FreeBSD : 
+         *      Each external function reference is resolved when the function is first called.
+         */
+        #define DL_LAZY   RTLD_LAZY
+        
+        /* Realocations are preformed when the object is loaded
+         * 
+         * @FreeBSD :
+         *      All external function references are bound immediately by dlopen().
+         *      RTLD_LAZY is normally preferred, for reasons of efficiency.  However, RTLD_NOW is useful to ensure that any undefined symbols are discovered
+         *      during the call to dlopen().
+         */
         #define DL_NOW    RTLD_NOW      // Realocations are preformed when the object is loaded
-        #define DL_LOCAL  RTLD_LOCAL    // All symbols are not made available for realocation processing by other modules
-        #define DL_GLOBAL RTLD_GLOBAL   // All symbols are made available for realocation processing by other modules
+        
+        // One of the following flags may be ORed into the mode argument
+
+        /* All symbols are not made available for realocation processing by other modules
+         * 
+         * @FreeBSD :
+         *      Symbols from this shared object and its directed acyclic graph (DAG) of needed objects will be available for resolving unde-
+	     *      fined references from all other shared objects.
+         */
+        #define DL_LOCAL  RTLD_LOCAL
+
+        /* All symbols are made available for realocation processing by other modules
+         *
+         * @FreeBSD :
+         *      Symbols in this shared object and its DAG of needed objects will be available for resolving undefined references only from
+		 *      other objects in the same DAG.  This is the default, but it may be specified explicitly with this flag.  
+         */
+        #define DL_GLOBAL RTLD_GLOBAL
+
+        /* When set, causes dynamic linker to exit after loading all objects needed by this shared object and printing a summary which
+		 * includes the absolute pathnames of all objects, to standard output.  With this flag dlopen() will return to the caller only in
+		 * the case of error.
+         *
+         */
+        #define DL_TRACE RTLD_TRACE
+            
+        /* Prevents unload of the loaded object on dlclose().	The same behaviour may be requested by -z nodelete option of the static
+		 * linker ld.
+         */
+        #define DL_NODELETE RTLD_NODELETE
+
+         /* Only return valid handle for the object if it is already loaded in the process address space, otherwise NULL is returned.
+		  * Other mode flags may be specified, which will be applied for promotion for the found object.
+          */
+        #define DL_NOLOAD RTLD_NOLOAD
 
         typedef void*       dlhandle_t; // the module file handle
         typedef const char* dlcstr_t;   // a portable type definition of the cstring
@@ -79,10 +124,13 @@ typedef void* dlptr_t; // pointer type for raw data pointers produced by the dls
     #include <Windows.h>
 
     // unix placeholders
-    #define DL_LAZY   0x00000000
-    #define DL_NOW    DL_LAZY
-    #define DL_LOCAL  DL_LAZY
-    #define DL_GLOBAL DL_LAZY
+    #define DL_LAZY     0x00000000
+    #define DL_NOW      DL_LAZY
+    #define DL_LOCAL    DL_LAZY
+    #define DL_GLOBAL   DL_LAZY
+    #define DL_TRACE    DL_LAZY
+    #define DL_NODELETE DL_LAZY
+    #define DL_NOLOAD   DL_LAZY
 
     // Windows portable of the above
     typedef HMODULE     dlhandle_t;
