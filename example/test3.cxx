@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
             });
 
             // boot up the loader
-            dl::loader_t      loader(argv[1]);
+            dl::loader_t      loader(argv[1], (DL_NOW | DL_NODELETE));
             
             // load in the number argument
             std::stringstream ss(argv[6]);
@@ -69,6 +69,7 @@ int main(int argc, char** argv) {
             else if (!loader.library(lib))
                 return EXIT_FAILURE;
             
+            loader.close();
             // call testprint()
             lib.symbol_as<testprint_fp>(argv[2])(argv[3]);
             std::cout << std::endl;
