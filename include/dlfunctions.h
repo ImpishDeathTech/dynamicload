@@ -65,11 +65,18 @@ IDT_DL_API dlptr_t    dlsymbol(dlhandle_t mod_, dlcstr_t sym_);
 /* Get the most recent error in a nice, basic formatted error string
  * @returns a basic cstring containing the error
  */
-IDT_DL_API dlcstr_t   dlgeterror();
+
+#if defined(IDT_DYNAMIC_LOAD_WIN32)
+IDT_DL_API dlcstr_t   dlerror(void);
+#endif
 
 /* Don't forget to free your module handle when you're finnished. This is C.
  *  @param mod_ = the module handle to be closed
+ *  @returns 0 if usccess, or -1 if failure;
  */
-IDT_DL_API void       dlfree(dlhandle_t mod_);
+IDT_DL_API int   dlfree(dlhandle_t mod_);
+
+// print the version and copyright
+IDT_DL_API void dlversion();
 
 #endif // 1
