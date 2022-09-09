@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     
     if (argc == 4) {
         // initialize the handle with a filepath and a flag
-        handle = dlhandlex(argv[1], DL_NOW);
+        handle = dlhandlex(argv[1], DL_LAZY);
         
         /* or without a flag, too. On unix, this will call with DL_LAZY,
          * call the below or the above function, both simultaniously on one 
@@ -54,27 +54,35 @@ int main(int argc, char** argv) {
 
         // if the handle is NULL, print the resulting error and exit with error code
         if (!handle) {
-            fprintf(stderr, "dlfunction error: %s: @ %p\n", dlgeterror(), handle);
+            fprintf(stderr, "dlfunction error: %s: @ %p\n", dlerror(), handle);
             return 1;
         }
+
         // clear any errors, they don't matter. Or maybe they do, check them if you want
-        dlgeterror();
+        dlerror();
 
         printsummin = (printsummin_fp)dlsymbol(handle, argv[2]);
 
         // if the symbol is NULL, print the resulting error and exit with error code
         if (!printsummin) {
-            fprintf(stderr, "dlfunction error: %s: @ %p\n", dlgeterror(), handle);
+            fprintf(stderr, "dlfunction error: %s: @ %p\n", dlerror(), handle);
             dlfree(handle);
             return 1;
         }
 
-        // call function
+        // print version
+        dlversion();
+        
+        // call funciton
+        printsummin("\n");
         printsummin(argv[3]);
         printsummin("\n");
 
         // always free the handle
-        dlfree(handle);
+        if (dlfree(handle) != 0) {
+            fprintf(stderr, "dlfunction error: %s: @ %p\n", dlerror(), handle);
+            return 1;
+        }
     }
     else {
         fprintf(stderr, "dlfunction error: argc %d not enough arguments! min 3\n", argc - 1);
