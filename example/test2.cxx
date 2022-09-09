@@ -46,10 +46,9 @@ int main(int argc, char** argv) {
             std::stringstream ss(argv[3]);
             
             /* initialize the loader with a filepath and a symbol
-             * this will call with DL_LAZY on unix
+             * this will call open with DL_LAZY on unix
              */
             dl::loader_t      loader(argv[1], argv[2]);
-
             // set up the function pointer and argument
             testtrunc_fp      testtrunc = nullptr;
             double            target    = 0;
