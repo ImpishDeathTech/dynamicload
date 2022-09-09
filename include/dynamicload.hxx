@@ -66,20 +66,21 @@ namespace dl {
             * @param symbol_ = the name of the function
             * @param data_   = the function data
             */
-            void insert(symbol_t symbol_, dlptr_t data_);
-            void insert(dlcstr_t symbol_, dlptr_t data_);
+            void    insert(symbol_t symbol_, dlptr_t data_);
+            void    insert(dlcstr_t symbol_, dlptr_t data_);
 
-        /* Fast cast the symbol using these template functions
-         * @param symbol_ = the symbol, of course
-         * The function pointer submitted to fill the template
-         *  must match the symbol's function exactly
-         */
-        template<typename T>
-        T symbol_as(symbol_t symbol_) {
-             return (T)m_ptr.at(symbol_);
-        }
+           /* Fast cast the symbol using these template functions
+            * @param symbol_ = the symbol, of course
+            * The function pointer submitted to fill the template
+            *  must match the symbol's function exactly
+            */
+            template<typename T>
+            T symbol_as(symbol_t symbol_) {
+                 return (T)m_ptr.at(symbol_);
+            }
     };
 
+    typedef registry_t* (*dlget_t)(symvec_t&);
 
     class IDT_DL_API loader_t {
         dlhandle_t  m_handle;
@@ -99,6 +100,8 @@ namespace dl {
             loader_t(dlcstr_t modName_, dlcstr_t symbol_, dword_t mode_);
             loader_t(symbol_t modName_, symbol_t symbol_);
             loader_t(dlcstr_t modName_, dlcstr_t symbol_);
+            loader_t(symbol_t modName_, dword_t mode_);
+            loader_t(dlcstr_t modName_, dword_t mode_);
             loader_t(symbol_t modName_);
             loader_t(dlcstr_t modName_);
             ~loader_t();
@@ -123,13 +126,13 @@ namespace dl {
             void        close();
 
                 template<typename T>
-                T symbol_as()                    { return (T)symbol(); }
+                T symbol_as()                 { return (T)symbol(); }
             
                 template<typename T>
                 T symbol_as(symbol_t symbol_) { return (T)dlsymbol(m_handle, symbol_.c_str()); }
 
                 template<typename T>
-                T symbol_as(dlcstr_t symbol_)    { return (T)dlsymbol(m_handle, symbol_); }
+                T symbol_as(dlcstr_t symbol_) { return (T)dlsymbol(m_handle, symbol_); }
     };
 }
 
