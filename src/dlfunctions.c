@@ -92,7 +92,7 @@ int dlfree(dlhandle_t mod_) {
     return -1;
 }
 
-void dlprint_version() {
+void dlversion() {
     char buffer[80];
     sprintf(buffer, "dynamicload-%d.%d %s", IDT_DYNAMIC_LOAD_VERSION_MAJOR, IDT_DYNAMIC_LOAD_VERSION_MINOR, "Copyright (c) 2022, Christopher Stephen Rafuse BSD-3-Clause"); 
     printf("%s\n", buffer);
